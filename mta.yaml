@@ -8,13 +8,16 @@ build-parameters:
   before-all:
     - builder: custom
       commands:
-        - npx cds build --production
+        - npm i --production
+        - npx -p @sap/cds-dk cds build --production
 modules:
   - name: learningCap001-srv
     type: nodejs
     path: gen/srv
     parameters:
       buildpack: nodejs_buildpack
+      disk-quota: 1024MB
+      memory: 1024MB
     build-parameters:
       builder: npm
     provides:
@@ -23,6 +26,7 @@ modules:
           srv-url: '${default-url}'
     requires:
       - name: learningCap001-db
+      - name: learningCap001-xsuaa
   - name: learningCap001-db-deployer
     type: hdb
     path: gen/db
@@ -30,9 +34,21 @@ modules:
       buildpack: nodejs_buildpack
     requires:
       - name: learningCap001-db
+        properties:
+            TARGET_CONTAINER: ~{hdi-service-name}
+
 resources:
   - name: learningCap001-db
     type: com.sap.xs.hdi-container
     parameters:
       service: hana
       service-plan: hdi-shared
+    properties:
+      hdi-service-name: ${service-name}
+  - name: learningCap001-xsuaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-plan: application
+

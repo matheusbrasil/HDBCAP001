@@ -1,5 +1,6 @@
-using my.bookshop as my from '../db/data-model';
+using hc450.officesupplies from '../db/data-model';
 
 service CatalogService {
-    @readonly entity Books as projection on my.Books;
+    entity Products  as projection on officesupplies.Products;
+    entity Suppliers as projection on officesupplies.Suppliers;
 }

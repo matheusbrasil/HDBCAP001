@@ -8,18 +8,29 @@
   "dependencies": {
     "@sap/cds": "^7",
     "express": "^4",
-    "@sap/cds-hana": "^2"
+    "@sap/cds-hana": "^2",
+    "@sap/xsenv": "^3",
+    "passport": "^0.6.0",
+    "@sap/xssec": "^3"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^1",
     "@sap/cds-dk": "^7"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "deploy": "cds deploy --vcap-file ./db/default-env.json --auto-undeploy",
+    "deploy:cf": "mbt build && cf deploy ./mta_archives/learningCap001_1.0.0.mtar",
+    "deploy:f": "mbt build && cf deploy ./mta_archives/learningCap001_1.0.0.mtar -f --delete-services --delete-service-keys",
+    "build:mta": "rimraf resources mta_archives && mbt build --mtar archive",
+    "clean": "rm -rf node_modules",
+    "reinstall": "npm run clean && npm install",
+    "undeploy": "cf undeploy learningCap001 --delete-services --delete-service-keys"
   },
   "cds": {
     "requires": {
-      "db": "hana"
+      "db": "hana",
+      "auth": "xsuaa"
     }
   }
 }
