@@ -1,0 +1,45 @@
+{
+	"role":{
+		"name": "GRANT_ADMIN_ACCESS",
+		"schema_privileges": [{
+		   "privileges": ["SELECT METADATA", 
+		    			  "SELECT CDS METADATA", 
+		    			  "SELECT", 
+		    			  "INSERT", 
+		    			  "EXECUTE", 
+		    			  "DELETE", 
+		    			  "UPDATE", 
+		    			  "CREATE TEMPORARY TABLE"
+		   ]
+		}],
+		
+		"object_privileges":[
+			{
+				"name": "HC450_OFFICESUPPLIES_PRODUCTS",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			},
+			{
+				"name": "HC450_OFFICESUPPLIES_PRODUCTS_TEXTS",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			},
+            {
+				"name": "HC450_OFFICESUPPLIES_SUPPLIERS",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			},
+			{
+				"name": "SAP_COMMON_CURRENCIES",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			},
+			{
+				"name": "SAP_COMMON_CURRENCIES_TEXTS",
+				"type": "TABLE",
+				"privileges": [ "SELECT" ]
+			}
+		]
+		
+	}
+}
