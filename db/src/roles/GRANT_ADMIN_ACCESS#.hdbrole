@@ -1,32 +1,6 @@
 {
 	"role":{
 		"name": "GRANT_ADMIN_ACCESS#",
-		"global_roles": ["GRANT_ADMIN_ACCESS"],
-		"schema_roles":[ 
-			{ 
-				"names": ["GRANT_ADMIN_ACCESS"] 
-			} 
-		],
-		"schema_privileges":[  
-			{  
-			  "privileges":["SELECT METADATA", 
-			  "SELECT CDS METADATA", 
-			  "SELECT", 
-			  "INSERT", 
-			  "EXECUTE", 
-			  "DELETE", 
-			  "UPDATE", 
-			  "CREATE TEMPORARY TABLE"],
-			  "privileges_with_grant_option":["SELECT METADATA", 
-			  "SELECT CDS METADATA", 
-			  "SELECT", 
-			  "INSERT", 
-			  "EXECUTE", 
-			  "DELETE", 
-			  "UPDATE", 
-			  "CREATE TEMPORARY TABLE"]
-			}
-		],
 		"object_privileges":[
 			{
 				"name": "HC450_OFFICESUPPLIES_PRODUCTS",
