@@ -1,54 +1,101 @@
-_schema-version: '3.1'
+_schema-version: "3.1"
 ID: learningCap001
-version: 1.0.0
 description: Learning CAP 001
+version: 1.0.0
+modules:
+- name: learningCap001-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: learningCap001-db
+  - name: learningCap001-xsuaa
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    disk-quota: 1024MB
+    memory: 1024MB
+  build-parameters:
+    builder: npm
+- name: learningCap001-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: learningCap001-db
+    properties:
+      TARGET_CONTAINER: ~{hdi-service-name}
+  parameters:
+    buildpack: nodejs_buildpack
+- name: learningCap001-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: learningCap001-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - learningcap001suppliers.zip
+      name: learningcap001suppliers
+      target-path: resources/
+- name: learningcap001suppliers
+  type: html5
+  path: app/suppliers
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: learningCap001-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+  properties:
+    hdi-service-name: ${service-name}
+- name: learningCap001-xsuaa
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+- name: learningCap001-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: learningCap001-html5-srv
+    service-plan: app-host
+- name: learningCap001-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: false
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: learningCap001-destination-service
+    service-plan: lite
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm i --production
-        - npx -p @sap/cds-dk cds build --production
-modules:
-  - name: learningCap001-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      buildpack: nodejs_buildpack
-      disk-quota: 1024MB
-      memory: 1024MB
-    build-parameters:
-      builder: npm
-    provides:
-      - name: srv-api
-        properties:
-          srv-url: '${default-url}'
-    requires:
-      - name: learningCap001-db
-      - name: learningCap001-xsuaa
-  - name: learningCap001-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: learningCap001-db
-        properties:
-            TARGET_CONTAINER: ~{hdi-service-name}
-
-resources:
-  - name: learningCap001-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
-    properties:
-      hdi-service-name: ${service-name}
-  - name: learningCap001-xsuaa
-    type: org.cloudfoundry.managed-service
-    parameters:
-      path: ./xs-security.json
-      service: xsuaa
-      service-plan: application
-
+  - builder: custom
+    commands:
+    - npm i --production
+    - npx -p @sap/cds-dk cds build --production
