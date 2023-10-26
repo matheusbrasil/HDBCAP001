@@ -9,6 +9,7 @@ modules:
   requires:
   - name: learningCap001-db
   - name: learningCap001-xsuaa
+  - name: learningCap001-destination-service
   provides:
   - name: srv-api
     properties:
@@ -40,9 +41,9 @@ modules:
     requires:
     - artifacts:
       - learningcap001suppliers.zip
-      name: learningcap001suppliers
+      name: learningcap001.suppliers
       target-path: resources/
-- name: learningcap001suppliers
+- name: learningcap001.suppliers
   type: html5
   path: app/suppliers
   build-parameters:
@@ -52,6 +53,36 @@ modules:
     - npm install
     - npm run build:cf
     supported-platforms: []
+- name: learningCap001-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: learningCap001-destination-service
+    parameters:
+      content-target: true
+  - name: learningCap001-repo-host
+    parameters:
+      service-key:
+        name: learningCap001-repo-host-key
+  - name: learningCap001-xsuaa
+    parameters:
+      service-key:
+        name: learningCap001-xsuaa-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: learningcap001_suppliers_learningCap001_repo_host
+          ServiceInstanceName: learningCap001-html5-srv
+          ServiceKeyName: learningCap001-repo-host-key
+          sap.cloud.service: learningcap001_suppliers
+        - Authentication: OAuth2UserTokenExchange
+          Name: learningcap001_suppliers_learningCap001_auth
+          ServiceInstanceName: learningCap001-xsuaa
+          ServiceKeyName: learningCap001-xsuaa-key
+          sap.cloud.service: learningcap001_suppliers
+        existing_destinations_policy: update
+  build-parameters:
+    no-source: true
 resources:
 - name: learningCap001-db
   type: com.sap.xs.hdi-container
@@ -76,7 +107,7 @@ resources:
   type: org.cloudfoundry.managed-service
   parameters:
     config:
-      HTML5Runtime_enabled: false
+      HTML5Runtime_enabled: true
       init_data:
         instance:
           destinations:
@@ -85,11 +116,20 @@ resources:
             ProxyType: Internet
             Type: HTTP
             URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: learningCap001-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: learningCap001-destination-service
     service-plan: lite
+  requires:
+  - name: srv-api
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
